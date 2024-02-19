@@ -12,3 +12,4 @@ D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\refint\ClinicW
 D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.pdb
 D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.genruntimeconfig.cache
 D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ref\ClinicWeb.Domain.dll
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.sourcelink.json

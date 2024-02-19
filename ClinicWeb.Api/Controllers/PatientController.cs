@@ -171,6 +171,29 @@ namespace ClinicWeb.Api.Controllers
         }
 
         [HttpGet]
+        [Route("GetAllPatients")]
+        public IActionResult GetAllPatients()
+        {
+
+            var patients =  unitOfWork.Repository<Patient>().GetAll();
+
+            if (patients.Any())
+            {
+
+                var patientList = patients.Select(patient => new
+                {
+                    Id = patient.Id,
+                    Name = patient.FullName,
+
+                });
+                return Ok(patientList);
+            }
+            return BadRequest(new { message = "Patients Not Found" });
+
+        }
+
+
+        [HttpGet]
         [Route("GePersonalDetails")]
         public async Task<IActionResult> GePersonalDetails(int PatientId)
         {

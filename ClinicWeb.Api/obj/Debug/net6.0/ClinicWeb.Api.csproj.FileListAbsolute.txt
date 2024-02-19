@@ -76,3 +76,4 @@ D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Api\obj\Debug\net6.0\ref\ClinicWeb.Api
 D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Api\bin\Debug\net6.0\ClinicWeb.Domain.dll
 D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Api\bin\Debug\net6.0\ClinicWeb.Domain.pdb
 D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Api\bin\Debug\net6.0\ClinicWeb.Api.staticwebassets.runtime.json
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Api\obj\Debug\net6.0\ClinicWeb.Api.sourcelink.json

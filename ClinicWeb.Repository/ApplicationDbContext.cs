@@ -31,6 +31,7 @@ namespace ClinicWeb.Repository
         public virtual DbSet<Session> Sessions { set; get; }
         public virtual DbSet<Service> Services { set; get; }
         public virtual DbSet<Visit> Visits { set; get; }
+        public virtual DbSet<Employee> Employees { set; get; }
        
 
     }

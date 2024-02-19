@@ -15,3 +15,4 @@ D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Repository\obj\Debug\net6.0\ref\Clinic
 D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Repository\bin\Debug\net6.0\ClinicWeb.Domain.dll
 D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Repository\bin\Debug\net6.0\ClinicWeb.Domain.pdb
 D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Repository\obj\Debug\net6.0\ClinicWeb.Repository.csproj.CopyComplete
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Repository\obj\Debug\net6.0\ClinicWeb.Repository.sourcelink.json
