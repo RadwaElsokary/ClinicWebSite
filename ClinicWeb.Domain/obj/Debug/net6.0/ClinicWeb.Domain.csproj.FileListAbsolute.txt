@@ -1,0 +1,14 @@
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\bin\Debug\net6.0\ClinicWeb.Domain.deps.json
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\bin\Debug\net6.0\ClinicWeb.Domain.runtimeconfig.json
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\bin\Debug\net6.0\ClinicWeb.Domain.dll
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\bin\Debug\net6.0\ClinicWeb.Domain.pdb
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.csproj.AssemblyReference.cache
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.AssemblyInfoInputs.cache
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.AssemblyInfo.cs
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.csproj.CoreCompileInputs.cache
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.dll
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\refint\ClinicWeb.Domain.dll
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.pdb
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ClinicWeb.Domain.genruntimeconfig.cache
+D:\Projects\.Net\Apps\ClinicWeb\ClinicWeb.Domain\obj\Debug\net6.0\ref\ClinicWeb.Domain.dll
