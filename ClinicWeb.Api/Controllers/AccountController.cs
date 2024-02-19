@@ -49,40 +49,7 @@ namespace ClinicWeb.Api.Controllers
         }
 
 
-        //[HttpPost]
-        //[Route("Registration")]
-        //public async Task<IActionResult> Registration([FromForm] RegisterDto model)
-        //{
-        //    var existingUserByEmail = await userManager.FindByEmailAsync(model.Email);
-        //    if (existingUserByEmail != null || await userManager.FindByNameAsync(model.Email) != null)
-        //    {
-        //        return Ok(new { message = "Email is already taken" });
-        //    }
-
-
-        //    var existingUsername = await userManager.FindByNameAsync(model.UserName);
-        //    if (existingUsername != null || await userManager.FindByEmailAsync(model.UserName) != null)
-        //    {
-        //        return Ok(new { message = "Username is already taken" });
-        //    }
-
-        //    var user = new ApplicationUser
-        //    {
-        //        Email = model.Email,
-        //        UserName = model.UserName,
-        //        FullName = model.FullName,
-        //    };
-
-        //    var result = await userManager.CreateAsync(user, model.Password);
-        //    if (result.Succeeded)
-        //    {
-        //        return StatusCode(200, new { message = "You Registered Successfully", UserId = user.Id });
-        //    }
-        //    else
-        //    {
-        //        return StatusCode(400, new { message = "User Not Added" });
-        //    }
-        //}
+      
         [HttpPost]
         [Route("Registration")]
         public async Task<IActionResult> Registration([FromForm] RegisterDto model)
@@ -152,6 +119,31 @@ namespace ClinicWeb.Api.Controllers
             return BadRequest("Invalid username/email or password.");
         }
 
+        [HttpGet]
+        [Route("GetProfile")]
+        public async Task<IActionResult> GetProfile(string  Id)
+        {
+            var user = await userManager.FindByIdAsync(Id);
+            if (user == null)
+                return BadRequest(new { message = "User Not Found" });
+
+            var userDto = new
+            {
+                PhotoPath = user.PhotoPath,
+                Email = user.Email,
+                UserName = user.UserName,
+                FirstName = user.FullName,
+                Phone = user.PhoneNumber,
+                Bio  = user.Bio,
+                City = user.City,
+                Country = user.Country,
+                State = user.State,
+
+
+            };
+            return Ok(userDto);
+        }
+
         [HttpPut]
         [Route("UpdateProfile")]
         public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileDto model, string Id)
@@ -191,7 +183,6 @@ namespace ClinicWeb.Api.Controllers
             if (result == null)
                 return BadRequest(new { message = "Profile Can't Updated " });
 
-            await unitOfWork.Complete();
             return Ok(new { message = "Profile Updated Successfully" });
         }
 

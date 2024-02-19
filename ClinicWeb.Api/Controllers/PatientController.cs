@@ -62,6 +62,27 @@ namespace ClinicWeb.Api.Controllers
         }
 
         [HttpPut]
+        [Route("ChangeState")]
+        public async Task<IActionResult> AddPersonalDeatilsPatient(string state, int PatientId)
+        {            
+            var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
+            if (patient == null)
+                return BadRequest(new { message = "Patient Not Found" });
+
+           
+            patient.State = state;
+
+            var result = await unitOfWork.Repository<Patient>().Update(patient);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "State Changed Successfully" });
+            }
+            return BadRequest(new { messag = "State Not Changed" });
+
+        }
+
+        [HttpPut]
         [Route("AddPersonalDeatilsPatient")]
         public async Task<IActionResult> AddPersonalDeatilsPatient([FromForm] AddPersonalDeatilsDto model, int PatientId)
         {
@@ -100,6 +121,28 @@ namespace ClinicWeb.Api.Controllers
             return BadRequest(new { messag = "Patient Not Added" });
 
         }
+
+        [HttpDelete]
+        [Route("DeletePatient")]
+        public async Task<IActionResult> DeletePatient(int PatientId)
+        {
+            var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
+            if (patient == null)
+                return BadRequest(new { message = "Patient Not Found" });
+
+            var result = await unitOfWork.Repository<Patient>().Delete(patient);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return StatusCode(200, new { message = "Patient Deleted Successfully" });
+            }
+            else
+            {
+                return StatusCode(400, new { message = "An error occur" });
+            }
+        }
+
+
 
         [HttpPost]
         [Route("AddSession")]
@@ -184,6 +227,7 @@ namespace ClinicWeb.Api.Controllers
                 {
                     Id = patient.Id,
                     Name = patient.FullName,
+                    Phone = patient.PhoneNumber
 
                 });
                 return Ok(patientList);
@@ -368,6 +412,8 @@ namespace ClinicWeb.Api.Controllers
             return Ok(visits);
         }
 
+        
+
     }
-    
+
 }

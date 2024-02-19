@@ -12,6 +12,5 @@
         public string? Address { set; get; }
         public string? State { set; get; }
         public string? Bio { set; get; }
-        public string? PhotoPath { set; get; }
     }
 }

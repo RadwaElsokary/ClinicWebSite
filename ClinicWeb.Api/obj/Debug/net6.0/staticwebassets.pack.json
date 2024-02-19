@@ -25,12 +25,20 @@
       "PackagePath": "staticwebassets\\images\\d3ef34d1-11c9-46b2-a4f4-08b1ccba921b_user2.jpg"
     },
     {
+      "Id": "D:\\Projects\\.Net\\Apps\\ClinicWeb\\ClinicWeb.Api\\wwwroot\\images\\efbbde22-eca9-44e5-a771-ee19d7e86a72_user3.jpg",
+      "PackagePath": "staticwebassets\\images\\efbbde22-eca9-44e5-a771-ee19d7e86a72_user3.jpg"
+    },
+    {
       "Id": "D:\\Projects\\.Net\\Apps\\ClinicWeb\\ClinicWeb.Api\\wwwroot\\images\\f40d3f95-310b-4845-8ff7-33805878d36a_user2.jpg",
       "PackagePath": "staticwebassets\\images\\f40d3f95-310b-4845-8ff7-33805878d36a_user2.jpg"
     },
     {
       "Id": "D:\\Projects\\.Net\\Apps\\ClinicWeb\\ClinicWeb.Api\\wwwroot\\images\\f93bc863-b562-40fc-a093-60317c44bd27_user2.jpg",
       "PackagePath": "staticwebassets\\images\\f93bc863-b562-40fc-a093-60317c44bd27_user2.jpg"
+    },
+    {
+      "Id": "D:\\Projects\\.Net\\Apps\\ClinicWeb\\ClinicWeb.Api\\wwwroot\\images\\fbbdac05-3950-47cf-8dd6-746c8d7a0123_user2.jpg",
+      "PackagePath": "staticwebassets\\images\\fbbdac05-3950-47cf-8dd6-746c8d7a0123_user2.jpg"
     },
     {
       "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.ClinicWeb.Api.Microsoft.AspNetCore.StaticWebAssets.props",
