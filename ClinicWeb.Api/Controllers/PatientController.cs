@@ -116,7 +116,7 @@ namespace ClinicWeb.Api.Controllers
             if (result)
             {
                 await unitOfWork.Complete();
-                return Ok(new { message = "Patient Added Successfully" });
+                return Ok(new { message = "Patient Updated Successfully" });
             }
             return BadRequest(new { messag = "Patient Not Added" });
 
