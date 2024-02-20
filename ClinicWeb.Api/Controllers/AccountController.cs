@@ -88,8 +88,6 @@ namespace ClinicWeb.Api.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception for further investigation
-                // You can use a logging framework like Serilog or log to a file
 
                 return StatusCode(500, new { message = "An error occurred during user registration" + ex });
             }

@@ -22,7 +22,7 @@ var Configuration = provider.GetRequiredService<IConfiguration>();
 builder.Services.AddDbContextPool<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SQLServerConnection")));
 
 
-builder.Services.AddIdentity<ApplicationUser,IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 

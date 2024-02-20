@@ -86,7 +86,7 @@ namespace ClinicWeb.Api.Controllers
         [Route("AddPersonalDeatilsPatient")]
         public async Task<IActionResult> AddPersonalDeatilsPatient([FromForm] AddPersonalDeatilsDto model, int PatientId)
         {
-            var codeExist = await unitOfWork.Repository<Patient>().AnyAsync(p => p.Code == model.Code);
+            var codeExist = await unitOfWork.Repository<Patient>().AnyAsync(p => p.Code == model.Code && p.Id != PatientId );
             if (codeExist && model.Code != null)
                 return BadRequest(new { message = "Exist Code" });
             var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
@@ -141,7 +141,6 @@ namespace ClinicWeb.Api.Controllers
                 return StatusCode(400, new { message = "An error occur" });
             }
         }
-
 
 
         [HttpPost]
@@ -285,7 +284,7 @@ namespace ClinicWeb.Api.Controllers
                     NoOfSessions = session.NumberSessions,
                 });
 
-                double totalPrice = sessions.Sum(session => session.Price);
+                double totalPrice = result.Where(a=>a.Status != Status.Paid).Sum(session => session.TotalPrice);
 
                 var response = new
                 {

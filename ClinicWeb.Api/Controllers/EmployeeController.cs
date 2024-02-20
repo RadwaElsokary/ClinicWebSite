@@ -1,4 +1,5 @@
 ﻿using ClinicWeb.Api.Dtos;
+using ClinicWeb.Domain.Enums;
 using ClinicWeb.Domain.Models;
 using ClinicWeb.Repository.IRepository;
 using Microsoft.AspNetCore.Http;
@@ -273,6 +274,65 @@ namespace ClinicWeb.Api.Controllers
             }
             return BadRequest(new { message = "Report Not Found" });
 
+        }
+
+        [HttpGet]
+        [Route("GetAllEmployeesCount")]
+        public IActionResult GetAllEmployeesCount()
+        {
+            var count = unitOfWork.Repository<Employee>().GetAll().Count();
+            return Ok(count);
+        }
+
+        [HttpGet]
+        [Route("GetAllEmployeesCountMale")]
+        public IActionResult GetAllEmployeesCountMale()
+        {
+            var count = unitOfWork.Repository<Employee>().GetAll().Where(s => s.Gender == Gender.Male).Count();
+            return Ok(count);
+        }
+
+        [HttpGet]
+        [Route("GetAllEmployeesCountFemale")]
+        public IActionResult GetAllEmployeesCountFemale()
+        {
+            var count = unitOfWork.Repository<Employee>().GetAll().Where(s=>s.Gender == Gender.Female).Count();
+            return Ok(count);
+        }
+
+        [HttpGet]
+        [Route("GetAllEmployeesCountForMonth")]
+        public IActionResult GetAllEmployeesCountForMonth()
+        {
+            var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+            var count = unitOfWork.Repository<Employee>().GetAll()
+                .Count(employee => employee.CreationDate >= thirtyDaysAgo);
+
+            return Ok(count);
+        }
+
+        [HttpGet]
+        [Route("GetAllEmployeesCountForMonthMale")]
+        public IActionResult GetAllEmployeesCountForMonthMale()
+        {
+            var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+            var count = unitOfWork.Repository<Employee>().GetAll()
+                .Where(a=>a.Gender == Gender.Male)
+                .Count(employee => employee.CreationDate >= thirtyDaysAgo);
+
+            return Ok(count);
+        }
+
+        [HttpGet]
+        [Route("GetAllEmployeesCountForMonthFeMale")]
+        public IActionResult GetAllEmployeesCountForMonthFeMale()
+        {
+            var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+            var count = unitOfWork.Repository<Employee>().GetAll()
+                .Where(a => a.Gender == Gender.Female)
+                .Count(employee => employee.CreationDate >= thirtyDaysAgo);
+
+            return Ok(count);
         }
 
     }

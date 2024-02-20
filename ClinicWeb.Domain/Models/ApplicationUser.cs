@@ -16,5 +16,6 @@ namespace ClinicWeb.Domain.Models
         public string? State { set; get; }
         public string? Bio { set; get; }
         public string? PhotoPath { set; get; }
+        public string? Job { set; get; }
     }
 }
