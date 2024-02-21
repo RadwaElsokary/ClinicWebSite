@@ -10,9 +10,9 @@ namespace ClinicWeb.Domain.Models
     public class Patient
     {
         public int Id { set; get; }
-        public string FullName { set; get; }
+        public string? FullName { set; get; }
         public string? Code { set; get; }
-        public string PhoneNumber { set; get; }
+        public string? PhoneNumber { set; get; }
         public string? Email { set; get; }
         public int? Age { set; get; }
         public string? Address { set; get; }

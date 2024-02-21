@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace ClinicWeb.Domain.Models
 {
-    public class RequestForLeave
+    public class Doctor
     {
         public int Id { set; get; }
-        public DateTime? StartDate { set; get; }
-        public DateTime? EndDate { set; get; }
-        public string? Reason { set; get; }
+        public string Name { set; get; }
+
     }
 }

@@ -399,5 +399,78 @@ namespace ClinicWeb.Api.Controllers
         }
 
 
+        [HttpPost]
+        [Route("AddDoctor")]
+        public async Task<IActionResult> AddDoctor(string Doctor)
+        {
+            var doctor = new Doctor
+            {
+                Name = Doctor
+
+            };
+            var result = await unitOfWork.Repository<Doctor>().Add(doctor);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Doctor Added Successfully " });
+            }
+            return BadRequest(new { message = "Doctor Not Added" });
+        }
+
+
+        [HttpPut]
+        [Route("UpdateDoctor")]
+        public async Task<IActionResult> UpdateDoctor(int DrId, string? Doctor)
+        {
+            var dr = await unitOfWork.Repository<Doctor>().GetById(DrId);
+            dr.Name = Doctor;
+
+            var result = await unitOfWork.Repository<Doctor>().Update(dr);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Doctor Updated Successfully " });
+            }
+            return BadRequest(new { message = "Doctor Not Update" });
+        }
+        [HttpDelete]
+        [Route("DeleteDoctor")]
+        public async Task<IActionResult> DeleteDoctor(int DrId)
+        {
+            var doctor = await unitOfWork.Repository<Doctor>().GetById(DrId);
+
+            var result = await unitOfWork.Repository<Doctor>().Delete(doctor);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Doctor Deleted Successfully " });
+            }
+            return BadRequest(new { message = "Doctor Not Deleted" });
+        }
+
+        [HttpGet]
+        [Route("GetAllDoctors")]
+        public IActionResult GetAllDoctors()
+        {
+
+            var doctors = unitOfWork.Repository<Doctor>().GetAll();
+
+            if (doctors.Any())
+            {
+
+                var drList = doctors.Select(dr => new
+                {
+                    Id = dr.Id,
+                    DrName = dr.Name,
+
+
+                });
+                return Ok(drList);
+            }
+            return BadRequest(new { message = "Doctors Not Found" });
+
+        }
+
+
     }
 }

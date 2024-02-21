@@ -10,10 +10,10 @@ namespace ClinicWeb.Domain.Models
     public class Attendance
     {
         public int Id { set; get; }
-        public string FirstName { set; get; }
-        public string LastName { set; get; }
-        public string Date { set; get; }
-        public string Time { set; get; }
-        public AttendanceState State { set; get; }
+        public string? FirstName { set; get; }
+        public string? LastName { set; get; }
+        public string? Date { set; get; }
+        public string? Time { set; get; }
+        public AttendanceState? State { set; get; }
     }
 }

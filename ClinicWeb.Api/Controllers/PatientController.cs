@@ -280,12 +280,12 @@ namespace ClinicWeb.Api.Controllers
                 var sessions = result.Select(session => new
                 {
                     Id = session.Id,
-                    ServiceName = unitOfWork.Repository<Service>().GetById(session.ServiceId).Result.ServiceName,
-                    Price = unitOfWork.Repository<Service>().GetById(session.ServiceId).Result.Price,
+                    ServiceName = unitOfWork.Repository<Service>().GetById((int)session.ServiceId).Result.ServiceName,
+                    Price = unitOfWork.Repository<Service>().GetById((int)session.ServiceId).Result.Price,
                     NoOfSessions = session.NumberSessions,
                 });
 
-                double totalPrice = result.Where(a=>a.Status != Status.Paid).Sum(session => session.TotalPrice);
+                double totalPrice = (double)result.Where(a=>a.Status != Status.Paid).Sum(session => session.TotalPrice);
 
                 var response = new
                 {
@@ -390,9 +390,9 @@ namespace ClinicWeb.Api.Controllers
 
             var paymentResponse = payments.Select(payment => new
             {
-                ImagePatient = unitOfWork.Repository<Patient>().GetById(payment.PatientId).Result.PhotoPath,
-                NamePatient = unitOfWork.Repository<Patient>().GetById(payment.PatientId).Result.FullName,
-                Code = unitOfWork.Repository<Patient>().GetById(payment.PatientId).Result.Code,
+                ImagePatient = unitOfWork.Repository<Patient>().GetById((int)payment.PatientId).Result.PhotoPath,
+                NamePatient = unitOfWork.Repository<Patient>().GetById((int)payment.PatientId).Result.FullName,
+                Code = unitOfWork.Repository<Patient>().GetById((int)payment.PatientId).Result.Code,
                 Amount = payment.PaidPrice,
                 Date = payment.Date,
                 PaymentStatus = payment.RemainingPrice == null ? Status.Paid.ToString() : Status.PartPaid.ToString(),
