@@ -143,6 +143,35 @@ namespace ClinicWeb.Api.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("AddSession")]
+        public async Task<IActionResult> AddSession([FromForm] AddSessionDto model, int ServiceId, int PatientId)
+        {
+            var service = await unitOfWork.Repository<Service>().GetById(ServiceId);
+            if (service == null)
+                return BadRequest(new { message = "Service Not Exist" });
+            var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
+            if (patient == null)
+                return BadRequest(new { message = "Patient Not Found" });
+            var session = new Session
+            {
+                ServiceId = service.Id,
+                PatientId = PatientId,
+                NumberSessions = model.NumberSessions,
+                TotalPrice = model.TotalPrice ,
+                Status = model.Status
+
+            };
+            var result = await unitOfWork.Repository<Session>().Add(session);
+            if (result)
+            {
+                patient.TotalPriceSessions = patient.TotalPriceSessions + session.TotalPrice ;
+                await unitOfWork.Repository<Patient>().Update(patient);
+                await unitOfWork.Complete();
+                return Ok(new { message = "Session Added Successfully" });
+            }
+            return BadRequest(new { messag = "Session Not Added" });
+        }
 
         [HttpPut]
         [Route("UpdateSession")]
@@ -156,6 +185,9 @@ namespace ClinicWeb.Api.Controllers
             if (service == null)
                 return BadRequest(new { message = "Service Not Exist" });
 
+            var patient = await unitOfWork.Repository<Patient>().GetById(session.PatientId.Value);
+
+            patient.TotalPriceSessions = patient.TotalPriceSessions - session.TotalPrice ;
 
             session.TotalPrice = model.TotalPrice;
             session.NumberSessions = model.NumberSessions;
@@ -166,6 +198,9 @@ namespace ClinicWeb.Api.Controllers
             var result = await unitOfWork.Repository<Session>().Update(session);
             if (result)
             {
+
+                patient.TotalPriceSessions = patient.TotalPriceSessions + session.TotalPrice;
+                await unitOfWork.Repository<Patient>().Update(patient);
                 await unitOfWork.Complete();
                 return Ok(new { message = "Session Updated Successfully" });
             }
@@ -181,10 +216,14 @@ namespace ClinicWeb.Api.Controllers
             if (session == null)
                 return BadRequest(new { message = "Session Not Exist" });
 
+            var patient = await unitOfWork.Repository<Patient>().GetById(session.PatientId.Value);
+
+            patient.TotalPriceSessions = patient.TotalPriceSessions - session.TotalPrice;
 
             var result = await unitOfWork.Repository<Session>().Delete(session);
             if (result)
             {
+                await unitOfWork.Repository<Patient>().Update(patient);
                 await unitOfWork.Complete();
                 return Ok(new { message = "Session Deleted Successfully" });
             }
@@ -369,18 +408,35 @@ namespace ClinicWeb.Api.Controllers
 
             var response = new
             {
-                TotalPrice = totalPrice,
+                TotalPriceBeforeDiscound = totalPrice,
+                Discound = totalPrice - patient.TotalPriceSessions,
+                TotalPriceAfterDiscound = patient.TotalPriceSessions
 
             };
 
             return Ok(response);
         }
 
-    
 
-        //[HttpPut]
-        //[Route("ChangeTotalPriceSessions")]
-        //public 
+
+        [HttpPut]
+        [Route("MakeDiscoundSession")]
+        public async Task<IActionResult> ChangeTotalPriceSessions(int Discound , int PatientId)
+        {
+            var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
+            if (patient == null)
+                return BadRequest(new { message = "Patient Not Found" });
+            patient.TotalPriceSessions = patient.TotalPriceSessions - Discound;
+
+            var result = await unitOfWork.Repository<Patient>().Update(patient);
+            if(result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Discound Appalyed Successfully" });
+            }
+
+            return BadRequest(new { message = "Discound Appalyed" });
+        }
 
 
         [HttpGet]

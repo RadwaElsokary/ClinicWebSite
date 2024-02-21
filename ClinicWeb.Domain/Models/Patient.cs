@@ -24,7 +24,7 @@ namespace ClinicWeb.Domain.Models
         public string? Notes { set; get; }
         public string? State { set; get; } 
         public string? PhotoPath { set; get; }
-        public int? TotalPriceSessions { set; get; }
+        public double? TotalPriceSessions { set; get; }
         public List<Session>? Sessions { set; get; }
         public List<Visit>? Visits { set; get; }
     }
