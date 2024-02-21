@@ -144,38 +144,54 @@ namespace ClinicWeb.Api.Controllers
         }
 
 
-        [HttpPost]
-        [Route("AddSession")]
-        public async Task<IActionResult> AddSession([FromForm] AddSessionDto model , int ServiceId , int PatientId)
+        [HttpPut]
+        [Route("UpdateSession")]
+        public async Task<IActionResult> UpdateSession([FromForm] AddSessionDto model , int SessionId , int ServiceId)
         {
+            var session = await unitOfWork.Repository<Session>().GetById(SessionId);
+            if (session == null)
+                return BadRequest(new { message = "Session Not Exist" });
+
             var service = await unitOfWork.Repository<Service>().GetById(ServiceId);
             if (service == null)
                 return BadRequest(new { message = "Service Not Exist" });
 
-            var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
-            if (patient == null)
-                return BadRequest(new { message = "Patient Not Found" });
+
+            session.TotalPrice = model.TotalPrice;
+            session.NumberSessions = model.NumberSessions;
+            session.Status = model.Status;
+            session.ServiceId = ServiceId;
 
 
-            var session = new Session
-            {
-                ServiceId = service.Id,
-                PatientId  = PatientId,
-                NumberSessions = model.NumberSessions,
-                TotalPrice = model.TotalPrice,
-                Status = model.Status
-                
-            };
-
-            var result = await unitOfWork.Repository<Session>().Add(session);
+            var result = await unitOfWork.Repository<Session>().Update(session);
             if (result)
             {
                 await unitOfWork.Complete();
-                return Ok(new { message = "Session Added Successfully" });
+                return Ok(new { message = "Session Updated Successfully" });
             }
-            return BadRequest(new { messag = "Session Not Added" });
+            return BadRequest(new { messag = "Session Not Updated" });
 
         }
+
+        [HttpDelete]
+        [Route("DeleteSession")]
+        public async Task<IActionResult> DeleteSession( int SessionId)
+        {
+            var session = await unitOfWork.Repository<Session>().GetById(SessionId);
+            if (session == null)
+                return BadRequest(new { message = "Session Not Exist" });
+
+
+            var result = await unitOfWork.Repository<Session>().Delete(session);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Session Deleted Successfully" });
+            }
+            return BadRequest(new { messag = "Session Not Deleted" });
+
+        }
+
 
         [HttpPost]
         [Route("AddVisit")]
@@ -210,6 +226,60 @@ namespace ClinicWeb.Api.Controllers
                 return Ok(new { message = "Visit Added Successfully" });
             }
             return BadRequest(new { messag = "Visit Not Added" });
+
+        }
+
+
+
+        [HttpPut]
+        [Route("UpdateVisit")]
+        public async Task<IActionResult> UpdateVisit([FromForm] VisitDto model, int VisitId)
+        {
+
+            var visit = await unitOfWork.Repository<Visit>().GetById(VisitId);
+            if (visit == null)
+                return BadRequest(new { message = "Patient Not Found" });
+
+
+            visit.DrName = model.DrName;
+            visit.Nurse = model.Nurse;
+            visit.SessionNote = model.SessionNote;
+            visit.Date = model.Date;
+            visit.TotalPrice = model.TotalPrice;
+            visit.PaidPrice = model.PaidPrice;
+            visit.RemainingPrice = model.RemainingPrice;
+            visit.Visa = model.Visa;
+            visit.Cash = model.Cash;
+            visit.TotalSessions = model.TotalSessions;
+
+            
+
+            var result = await unitOfWork.Repository<Visit>().Update(visit);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Visit Updated Successfully" });
+            }
+            return BadRequest(new { messag = "Visit Not Updated" });
+
+        }
+
+        [HttpDelete]
+        [Route("DeleteVisit")]
+        public async Task<IActionResult> DeleteVisit(int VisitId)
+        {
+
+            var visit = await unitOfWork.Repository<Visit>().GetById(VisitId);
+            if (visit == null)
+                return BadRequest(new { message = "Patient Not Found" });
+
+            var result = await unitOfWork.Repository<Visit>().Delete(visit);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Visit Deleted Successfully" });
+            }
+            return BadRequest(new { messag = "Visit Not Deleted" });
 
         }
 
