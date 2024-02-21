@@ -472,5 +472,78 @@ namespace ClinicWeb.Api.Controllers
         }
 
 
+        [HttpPost]
+        [Route("AddState")]
+        public async Task<IActionResult> AddState(string State)
+        {
+            var state = new State
+            {
+                Name = State
+
+            };
+            var result = await unitOfWork.Repository<State>().Add(state);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "State Added Successfully " });
+            }
+            return BadRequest(new { message = "State Not Added" });
+        }
+
+
+        [HttpPut]
+        [Route("UpdateState")]
+        public async Task<IActionResult> UpdateState(int StateId, string? State)
+        {
+            var state = await unitOfWork.Repository<State>().GetById(StateId);
+            state.Name = State;
+
+            var result = await unitOfWork.Repository<State>().Update(state);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "State Updated Successfully " });
+            }
+            return BadRequest(new { message = "State Not Update" });
+        }
+        [HttpDelete]
+        [Route("DeleteState")]
+        public async Task<IActionResult> DeleteState(int StateId)
+        {
+            var state = await unitOfWork.Repository<State>().GetById(StateId);
+
+            var result = await unitOfWork.Repository<State>().Delete(state);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "State Deleted Successfully " });
+            }
+            return BadRequest(new { message = "State Not Deleted" });
+        }
+
+        [HttpGet]
+        [Route("GetAllStates")]
+        public IActionResult GetAllStates()
+        {
+
+            var states = unitOfWork.Repository<State>().GetAll();
+
+            if (states.Any())
+            {
+
+                var stateList = states.Select(state => new
+                {
+                    Id = state.Id,
+                    StateName = state.Name,
+
+
+                });
+                return Ok(stateList);
+            }
+            return BadRequest(new { message = "States Not Found" });
+
+        }
+
+
     }
 }

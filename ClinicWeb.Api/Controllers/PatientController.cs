@@ -16,7 +16,7 @@ namespace ClinicWeb.Api.Controllers
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IWebHostEnvironment webHostEnvironment;
-        public PatientController (IUnitOfWork unitOfWork , IWebHostEnvironment webHostEnvironment)
+        public PatientController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             this.unitOfWork = unitOfWork;
             this.webHostEnvironment = webHostEnvironment;
@@ -43,7 +43,7 @@ namespace ClinicWeb.Api.Controllers
         [Route("AddPatient")]
         public async Task<IActionResult> AddPatient([FromForm] AddPatientDto model)
         {
- 
+
             var patient = new Patient
             {
                 FullName = model.FullName,
@@ -57,19 +57,19 @@ namespace ClinicWeb.Api.Controllers
                 await unitOfWork.Complete();
                 return Ok(new { message = "Patient Added Successfully" });
             }
-            return BadRequest(new { messag = "Patient Not Added" });    
+            return BadRequest(new { messag = "Patient Not Added" });
 
         }
 
         [HttpPut]
         [Route("ChangeState")]
         public async Task<IActionResult> AddPersonalDeatilsPatient(string state, int PatientId)
-        {            
+        {
             var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
 
-           
+
             patient.State = state;
 
             var result = await unitOfWork.Repository<Patient>().Update(patient);
@@ -86,7 +86,7 @@ namespace ClinicWeb.Api.Controllers
         [Route("AddPersonalDeatilsPatient")]
         public async Task<IActionResult> AddPersonalDeatilsPatient([FromForm] AddPersonalDeatilsDto model, int PatientId)
         {
-            var codeExist = await unitOfWork.Repository<Patient>().AnyAsync(p => p.Code == model.Code && p.Id != PatientId );
+            var codeExist = await unitOfWork.Repository<Patient>().AnyAsync(p => p.Code == model.Code && p.Id != PatientId);
             if (codeExist && model.Code != null)
                 return BadRequest(new { message = "Exist Code" });
             var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
@@ -111,7 +111,7 @@ namespace ClinicWeb.Api.Controllers
             patient.Notes = model.Notes;
             patient.State = model.State;
 
-            
+
 
             var result = await unitOfWork.Repository<Patient>().Update(patient);
             if (result)
@@ -146,7 +146,7 @@ namespace ClinicWeb.Api.Controllers
 
         [HttpPut]
         [Route("UpdateSession")]
-        public async Task<IActionResult> UpdateSession([FromForm] AddSessionDto model , int SessionId , int ServiceId)
+        public async Task<IActionResult> UpdateSession([FromForm] AddSessionDto model, int SessionId, int ServiceId)
         {
             var session = await unitOfWork.Repository<Session>().GetById(SessionId);
             if (session == null)
@@ -175,7 +175,7 @@ namespace ClinicWeb.Api.Controllers
 
         [HttpDelete]
         [Route("DeleteSession")]
-        public async Task<IActionResult> DeleteSession( int SessionId)
+        public async Task<IActionResult> DeleteSession(int SessionId)
         {
             var session = await unitOfWork.Repository<Session>().GetById(SessionId);
             if (session == null)
@@ -197,7 +197,7 @@ namespace ClinicWeb.Api.Controllers
         [Route("AddVisit")]
         public async Task<IActionResult> AddVisit([FromForm] VisitDto model, int PatientId)
         {
-            
+
             var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
@@ -252,7 +252,7 @@ namespace ClinicWeb.Api.Controllers
             visit.Cash = model.Cash;
             visit.TotalSessions = model.TotalSessions;
 
-            
+
 
             var result = await unitOfWork.Repository<Visit>().Update(visit);
             if (result)
@@ -288,7 +288,7 @@ namespace ClinicWeb.Api.Controllers
         public IActionResult GetAllPatients()
         {
 
-            var patients =  unitOfWork.Repository<Patient>().GetAll();
+            var patients = unitOfWork.Repository<Patient>().GetAll();
 
             if (patients.Any())
             {
@@ -316,9 +316,9 @@ namespace ClinicWeb.Api.Controllers
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
 
-            
-                return Ok(patient);
-            
+
+            return Ok(patient);
+
 
         }
 
@@ -335,17 +335,7 @@ namespace ClinicWeb.Api.Controllers
 
             if (result.Any())
             {
-                var partPaid = result.Any(a => a.Status == Status.PartPaid);
-                var unpaid = result.Any(a => a.Status == Status.UnPaid);
-                var paid = result.Any(a => a.Status == Status.Paid);
 
-                Status paymentStatus;
-                if (paid && !partPaid && !unpaid)
-                    paymentStatus = Status.Paid;
-                else if (!paid && !partPaid && unpaid)
-                    paymentStatus = Status.UnPaid;
-                else
-                    paymentStatus = Status.PartPaid;
 
                 var sessions = result.Select(session => new
                 {
@@ -355,20 +345,43 @@ namespace ClinicWeb.Api.Controllers
                     NoOfSessions = session.NumberSessions,
                 });
 
-                double totalPrice = (double)result.Where(a=>a.Status != Status.Paid).Sum(session => session.TotalPrice);
 
-                var response = new
-                {
-                    SessionList = sessions,
-                    PayState = paymentStatus.ToString(),
-                    TotalPrice = totalPrice
-                };
-
-                return Ok(response);
+                return Ok(sessions);
             }
 
             return BadRequest(new { message = "Sessions Not Found" });
         }
+
+
+        [HttpGet]
+        [Route("GetTotalPriceSession")]
+        public async Task<IActionResult> GetTotalPriceSession(int PatientId, double Descound)
+        {
+            var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
+            if (patient == null)
+                return BadRequest(new { message = "Patient Not Found" });
+
+            var result = unitOfWork.Repository<Session>().GetAll().Where(v => v.PatientId == PatientId).ToList();
+
+
+
+            double totalPrice = (double)result.Sum(session => session.TotalPrice);
+
+            var response = new
+            {
+                TotalPrice = totalPrice,
+
+            };
+
+            return Ok(response);
+        }
+
+    
+
+        //[HttpPut]
+        //[Route("ChangeTotalPriceSessions")]
+        //public 
+
 
         [HttpGet]
         [Route("GetAllVisitPatient")]

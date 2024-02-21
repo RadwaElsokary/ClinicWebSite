@@ -38,6 +38,7 @@ namespace ClinicWeb.Repository
         public virtual DbSet<RequestForLeave> RequestForLeaves { set; get; }
         public virtual DbSet<Report> Reports { set; get; }
         public virtual DbSet<Doctor> Doctors { set; get; }
+        public virtual DbSet<State> States { set; get; }
 
 
     }
