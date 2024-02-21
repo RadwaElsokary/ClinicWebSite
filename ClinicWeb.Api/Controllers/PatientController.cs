@@ -223,13 +223,45 @@ namespace ClinicWeb.Api.Controllers
             var result = await unitOfWork.Repository<Session>().Delete(session);
             if (result)
             {
-                await unitOfWork.Repository<Patient>().Update(patient);
+                  await unitOfWork.Repository<Patient>().Update(patient);
                 await unitOfWork.Complete();
                 return Ok(new { message = "Session Deleted Successfully" });
             }
             return BadRequest(new { messag = "Session Not Deleted" });
 
         }
+
+
+        [HttpGet]
+        [Route("GetTotalPriceToVisit")]
+        public async Task<IActionResult> GetTotalPriceToVisit(int PatientId)
+        {
+            var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
+            if (patient == null)
+                return BadRequest(new { message = "Patient Not Found" });
+
+
+            return Ok( new { totalPrice = patient.TotalPriceSessions });
+        }
+
+        [HttpGet]
+        [Route("GetRemaningPrice")]
+        public async Task<IActionResult> GetRemaningPrice(int PatientId)
+        {
+            var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
+            if (patient == null)
+                return BadRequest(new { message = "Patient Not Found" });
+
+            var result = unitOfWork.Repository<Visit>().GetAll().Where(v => v.PatientId == PatientId).ToList();
+
+            var paidMoney = result.Sum(a => a.PaidPrice);
+
+            var remaning = patient.TotalPriceSessions - result.Sum(session => session.TotalPrice);
+
+            return Ok(new { remaning = remaning});
+        }
+
+
 
 
         [HttpPost]
