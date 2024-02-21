@@ -130,12 +130,13 @@ namespace ClinicWeb.Api.Controllers
                 PhotoPath = user.PhotoPath,
                 Email = user.Email,
                 UserName = user.UserName,
-                FirstName = user.FullName,
+                FullName = user.FullName,
                 Phone = user.PhoneNumber,
                 Bio  = user.Bio,
                 City = user.City,
                 Country = user.Country,
                 State = user.State,
+                Address = user.Address
 
 
             };
