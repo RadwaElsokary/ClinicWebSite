@@ -41,6 +41,38 @@ namespace ClinicWeb.Api.Controllers
             return BadRequest(new { message = "Service Not Added" });
         }
 
+        [HttpPut]
+        [Route("UpdateService")]
+        public async Task<IActionResult> UpdateService([FromForm] ServicesDto model, int ServiceId)
+        {
+            var service = await unitOfWork.Repository<Service>().GetById(ServiceId);
+            service.ServiceName = model.Name;
+            service.Price = model.Price;
+           
+            var result = await unitOfWork.Repository<Service>().Update(service);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Service Updated Successfully " });
+            }
+            return BadRequest(new { message = "Service Not Updated" });
+        }
+
+        [HttpDelete]
+        [Route("DeleteService")]
+        public async Task<IActionResult> DeleteService(int ServiceId)
+        {
+            var service = await unitOfWork.Repository<Service>().GetById(ServiceId);
+
+            var result = await unitOfWork.Repository<Service>().Delete(service);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Service Deleted Successfully " });
+            }
+            return BadRequest(new { message = "Service Not Deleted" });
+        }
+
         [HttpGet]
         [Route("GetAllServices")]
         public IActionResult GetAllServices()
@@ -82,6 +114,37 @@ namespace ClinicWeb.Api.Controllers
             return BadRequest(new { message = "Branch Not Added" });
         }
 
+
+        [HttpPut]
+        [Route("UpdateBranch")]
+        public async Task<IActionResult> UpdateBranch( int BranchID,string? Branch)
+        {
+            var branch = await unitOfWork.Repository<Branch>().GetById(BranchID);
+            branch.Name = Branch;
+           
+            var result = await unitOfWork.Repository<Branch>().Update(branch);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Branch Updated Successfully " });
+            }
+            return BadRequest(new { message = "Branch Not Update" });
+        }
+        [HttpDelete]
+        [Route("DeleteBranch")]
+        public async Task<IActionResult> DeleteBranch(int BranchId)
+        {
+            var branch = await unitOfWork.Repository<Branch>().GetById(BranchId);
+
+            var result = await unitOfWork.Repository<Branch>().Delete(branch);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Branch Deleted Successfully " });
+            }
+            return BadRequest(new { message = "Branch Not Deleted" });
+        }
+
         [HttpGet]
         [Route("GetAllBranchs")]
         public IActionResult GetAllBranchs()
@@ -121,6 +184,37 @@ namespace ClinicWeb.Api.Controllers
                 return Ok(new { message = "Diagnosis Added Successfully " });
             }
             return BadRequest(new { message = "Diagnosis Not Added" });
+        }
+
+        [HttpPut]
+        [Route("UpdateDiagnosis")]
+        public async Task<IActionResult> UpdateDiagnosis(int DiagnosisId,string Diagnosis)
+        {
+            var disgnosis = await unitOfWork.Repository<Diagnosis>().GetById(DiagnosisId);
+            disgnosis.Name = Diagnosis;
+
+            var result = await unitOfWork.Repository<Diagnosis>().Update(disgnosis);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Diagnosis Updated Successfully " });
+            }
+            return BadRequest(new { message = "Diagnosis Not Updated" });
+        }
+
+        [HttpDelete]
+        [Route("DeleteDiagnosis")]
+        public async Task<IActionResult> DeleteDiagnosis(int DiagnosisId)
+        {
+            var diagnosis = await unitOfWork.Repository<Diagnosis>().GetById(DiagnosisId);
+
+            var result = await unitOfWork.Repository<Diagnosis>().Delete(diagnosis);
+            if (result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Branch Deleted Successfully " });
+            }
+            return BadRequest(new { message = "Branch Not Deleted" });
         }
 
         [HttpGet]

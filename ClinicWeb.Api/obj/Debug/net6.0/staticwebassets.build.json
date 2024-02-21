@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Jmf50gpUPNTd7lq6saEX+wIBYPzIAH+jD41CCZgASCk=",
+  "Hash": "UB2i3DScPGNAYxYKDzwoD+7xoG/CdEEv9RcylDxveI0=",
   "Source": "ClinicWeb.Api",
   "BasePath": "_content/ClinicWeb.Api",
   "Mode": "Default",
@@ -16,6 +16,25 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "D:\\Projects\\.Net\\Apps\\ClinicWeb\\ClinicWeb.Api\\wwwroot\\images\\244a7170-5d7a-448a-9b03-617892fbc17e_user1.jpg",
+      "SourceId": "ClinicWeb.Api",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Projects\\.Net\\Apps\\ClinicWeb\\ClinicWeb.Api\\wwwroot\\",
+      "BasePath": "_content/ClinicWeb.Api",
+      "RelativePath": "images/244a7170-5d7a-448a-9b03-617892fbc17e_user1.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\244a7170-5d7a-448a-9b03-617892fbc17e_user1.jpg"
+    },
     {
       "Identity": "D:\\Projects\\.Net\\Apps\\ClinicWeb\\ClinicWeb.Api\\wwwroot\\images\\2a9a427b-a14c-4549-96d0-a2590ed91570_user2.jpg",
       "SourceId": "ClinicWeb.Api",
