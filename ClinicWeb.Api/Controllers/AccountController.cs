@@ -109,7 +109,7 @@ namespace ClinicWeb.Api.Controllers
                 if (result.Succeeded)
                 {
                     
-                    return Ok(new { message = "You Logged Successfully"});
+                    return Ok(new { message = "You Logged Successfully" , UserId = user.Id});
                 }
             }
 

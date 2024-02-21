@@ -90,6 +90,7 @@ namespace ClinicWeb.Api.Controllers
             if (codeExist && model.Code != null)
                 return BadRequest(new { message = "Exist Code" });
             var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
+
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
 

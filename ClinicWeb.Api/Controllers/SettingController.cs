@@ -4,6 +4,7 @@ using ClinicWeb.Repository.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Security.Claims;
 
 namespace ClinicWeb.Api.Controllers
@@ -181,23 +182,21 @@ namespace ClinicWeb.Api.Controllers
         [Route("GetAllUsers")]
         public IActionResult GetAllUsers()
         {
+            var users = unitOfWork.Repository<ApplicationUser>().GetAll().ToList();
 
-            var users = unitOfWork.Repository<ApplicationUser>().GetAll();
-
-            if (users.Any())
+            var usersList = users.Select(user =>
             {
+                var roles = userManager.GetRolesAsync(user);
 
-                var userList = users.Select(user => new
+                return new
                 {
                     Id = user.Id,
                     Name = user.FullName,
+                    Roles = roles.Result
+                };
+            });
 
-
-                });
-                return Ok(userList);
-            }
-            return BadRequest(new { message = "Users Not Found" });
-
+            return Ok(usersList);
         }
 
         [HttpDelete]
@@ -240,6 +239,29 @@ namespace ClinicWeb.Api.Controllers
                 return BadRequest(new { message = "Role Not Added" });
             }
         }
+
+
+        [HttpGet]
+        [Route("GetAllRoles")]
+        public IActionResult GetAllRoles()
+        {
+            var roles = unitOfWork.Repository<IdentityRole>().GetAll();
+
+            if (roles.Any())
+            {
+                var roleList = roles.Select(role => new
+                {
+                    Id = role.Id,
+                    Name = role.Name
+                });
+
+                return Ok(roleList);
+            }
+
+            return BadRequest(new { message = "Roles Not Found" });
+        }
+
+
 
         [HttpPost]
         [Route("AddRoleToUser")]
