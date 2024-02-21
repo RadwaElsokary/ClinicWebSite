@@ -178,7 +178,7 @@ namespace ClinicWeb.Api.Controllers
             }
             user.PhotoPath = ProcessUploadFile(model.Photo);
 
-            var result = userManager.UpdateAsync(user);
+            var result = await userManager.UpdateAsync(user);
             if (result == null)
                 return BadRequest(new { message = "Profile Can't Updated " });
 

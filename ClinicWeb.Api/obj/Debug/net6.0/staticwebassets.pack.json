@@ -1,6 +1,10 @@
 {
   "Files": [
     {
+      "Id": "D:\\Projects\\.Net\\Apps\\ClinicWeb\\ClinicWeb.Api\\wwwroot\\images\\2a9a427b-a14c-4549-96d0-a2590ed91570_user2.jpg",
+      "PackagePath": "staticwebassets\\images\\2a9a427b-a14c-4549-96d0-a2590ed91570_user2.jpg"
+    },
+    {
       "Id": "D:\\Projects\\.Net\\Apps\\ClinicWeb\\ClinicWeb.Api\\wwwroot\\images\\361e5d51-56b8-4e6a-9889-1ac9b4519d95_user2.jpg",
       "PackagePath": "staticwebassets\\images\\361e5d51-56b8-4e6a-9889-1ac9b4519d95_user2.jpg"
     },
