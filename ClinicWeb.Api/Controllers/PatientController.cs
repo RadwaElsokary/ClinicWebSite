@@ -38,17 +38,33 @@ namespace ClinicWeb.Api.Controllers
             return uniqueFileName;
         }
 
-
         [HttpPost]
         [Route("AddPatient")]
-        public async Task<IActionResult> AddPatient([FromForm] AddPatientDto model)
+        public async Task<IActionResult> AddPatient([FromForm] AddPersonalDeatilsDto model)
         {
+
+            var codeExist = await unitOfWork.Repository<Patient>().AnyAsync(p => p.Code == model.Code);
+            if (codeExist && model.Code != null)
+                return BadRequest(new { message = "Exist Code!" });
+
+            string uniqueFileName = ProcessUploadFile(model.Image);
 
             var patient = new Patient
             {
                 FullName = model.FullName,
                 PhoneNumber = model.PhoneNumber,
-
+                Email = model.Email,
+                Age = model.Age,
+                Gender = model.Gender,
+                PhotoPath = uniqueFileName,
+                Address = model.Address,
+                Code = model.Code,
+                Branch = model.Branch,
+                Diagnoses = model.Diagnoses,
+                DrName = model.DrName,
+                FirstVist = model.FirstVist,
+                Notes = model.Notes,
+                State = model.State
             };
 
             var result = await unitOfWork.Repository<Patient>().Add(patient);
@@ -57,34 +73,13 @@ namespace ClinicWeb.Api.Controllers
                 await unitOfWork.Complete();
                 return Ok(new { message = "Patient Added Successfully" });
             }
-            return BadRequest(new { messag = "Patient Not Added" });
-
+            return BadRequest(new { message = "An error occurred while adding the patient" });
         }
 
-        [HttpPut]
-        [Route("ChangeState")]
-        public async Task<IActionResult> AddPersonalDeatilsPatient(string state, int PatientId)
-        {
-            var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
-            if (patient == null)
-                return BadRequest(new { message = "Patient Not Found" });
-
-
-            patient.State = state;
-
-            var result = await unitOfWork.Repository<Patient>().Update(patient);
-            if (result)
-            {
-                await unitOfWork.Complete();
-                return Ok(new { message = "State Changed Successfully" });
-            }
-            return BadRequest(new { messag = "State Not Changed" });
-
-        }
 
         [HttpPut]
         [Route("AddPersonalDeatilsPatient")]
-        public async Task<IActionResult> AddPersonalDeatilsPatient([FromForm] AddPersonalDeatilsDto model, int PatientId)
+        public async Task<IActionResult> UpdatePatient([FromForm] AddPersonalDeatilsDto model, int PatientId)
         {
             var codeExist = await unitOfWork.Repository<Patient>().AnyAsync(p => p.Code == model.Code && p.Id != PatientId);
             if (codeExist && model.Code != null)
@@ -123,6 +118,8 @@ namespace ClinicWeb.Api.Controllers
 
         }
 
+
+      
         [HttpDelete]
         [Route("DeletePatient")]
         public async Task<IActionResult> DeletePatient(int PatientId)
@@ -172,6 +169,23 @@ namespace ClinicWeb.Api.Controllers
             }
             return BadRequest(new { messag = "Session Not Added" });
         }
+
+        [HttpGet]
+        [Route("GetSession")]
+        public async Task<IActionResult> GetSession( int SessionId)
+        {
+            var session = await unitOfWork.Repository<Session>().GetById(SessionId);
+            if (session == null)
+                return BadRequest(new { message = "Session Not Exist" });
+
+            var service = await unitOfWork.Repository<Service>().GetById(session.Id);
+            if (service == null)
+                return BadRequest(new { message = "Service Not Exist" });
+
+                return Ok(new {SessionService = service.ServiceName , ServicePrice = service.Price , NOSessions = session.NumberSessions ,Status = session.Status.GetValueOrDefault(), TotalPrice = session.TotalPrice });
+          
+        }
+
 
         [HttpPut]
         [Route("UpdateSession")]
@@ -262,8 +276,6 @@ namespace ClinicWeb.Api.Controllers
         }
 
 
-
-
         [HttpPost]
         [Route("AddVisit")]
         public async Task<IActionResult> AddVisit([FromForm] VisitDto model, int PatientId)
@@ -300,6 +312,39 @@ namespace ClinicWeb.Api.Controllers
 
         }
 
+
+        [HttpGet]
+        [Route("GetVisit")]
+        public async Task<IActionResult> GetVisit(int VisitId)
+        {
+
+            var visit = await unitOfWork.Repository<Visit>().GetById(VisitId);
+            if (visit == null)
+                return BadRequest(new { message = "Patient Not Found" });
+
+
+            //visit.DrName = model.DrName;
+            //visit.Nurse = model.Nurse;
+            //visit.SessionNote = model.SessionNote;
+            //visit.Date = model.Date;
+            //visit.TotalPrice = model.TotalPrice;
+            //visit.PaidPrice = model.PaidPrice;
+            //visit.RemainingPrice = model.RemainingPrice;
+            //visit.Visa = model.Visa;
+            //visit.Cash = model.Cash;
+            //visit.TotalSessions = model.TotalSessions;
+
+
+
+            //var result = await unitOfWork.Repository<Visit>().Update(visit);
+            //if (result)
+            //{
+                //await unitOfWork.Complete();
+                return Ok(visit);
+            //}
+           // return BadRequest(new { messag = "Visit Not Updated" });
+
+        }
 
 
         [HttpPut]
@@ -433,8 +478,6 @@ namespace ClinicWeb.Api.Controllers
                 return BadRequest(new { message = "Patient Not Found" });
 
             var result = unitOfWork.Repository<Session>().GetAll().Where(v => v.PatientId == PatientId).ToList();
-
-
 
             double totalPrice = (double)result.Sum(session => session.TotalPrice);
 

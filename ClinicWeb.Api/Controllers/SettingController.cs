@@ -41,6 +41,20 @@ namespace ClinicWeb.Api.Controllers
             return BadRequest(new { message = "Service Not Added" });
         }
 
+        [HttpGet]
+        [Route("GetService")]
+        public async Task<IActionResult> GetService( int ServiceId)
+        {
+            var service = await unitOfWork.Repository<Service>().GetById(ServiceId);
+            if (service == null)
+                return BadRequest(new { message = "Service Not Found" });
+
+                return Ok(new { Name  = service.ServiceName , Price = service.Price });
+           
+        }
+
+
+
         [HttpPut]
         [Route("UpdateService")]
         public async Task<IActionResult> UpdateService([FromForm] ServicesDto model, int ServiceId)
@@ -114,6 +128,19 @@ namespace ClinicWeb.Api.Controllers
             return BadRequest(new { message = "Branch Not Added" });
         }
 
+        [HttpGet]
+        [Route("GetBranch")]
+        public async Task<IActionResult> GetBranch(int Id)
+        {
+            var branch = await unitOfWork.Repository<Branch>().GetById(Id);
+            if (branch == null)
+                return BadRequest(new { message = "Branch Not Found" });
+
+            return Ok(new { Name = branch.Name});
+
+        }
+
+
 
         [HttpPut]
         [Route("UpdateBranch")]
@@ -184,6 +211,19 @@ namespace ClinicWeb.Api.Controllers
                 return Ok(new { message = "Diagnosis Added Successfully " });
             }
             return BadRequest(new { message = "Diagnosis Not Added" });
+        }
+
+
+        [HttpGet]
+        [Route("GetDiagnosis")]
+        public async Task<IActionResult> GetDiagnosis(int Id)
+        {
+            var diagnosis = await unitOfWork.Repository<Diagnosis>().GetById(Id);
+            if (diagnosis == null)
+                return BadRequest(new { message = "Diagnosis Not Found" });
+
+            return Ok(new { Name = diagnosis.Name });
+
         }
 
         [HttpPut]
@@ -418,6 +458,18 @@ namespace ClinicWeb.Api.Controllers
         }
 
 
+        [HttpGet]
+        [Route("GetDoctor")]
+        public async Task<IActionResult> GetDoctor(int Id)
+        {
+            var doctor = await unitOfWork.Repository<Doctor>().GetById(Id);
+            if (doctor == null)
+                return BadRequest(new { message = "Doctors Not Found" });
+
+            return Ok(new { Name = doctor.Name });
+
+        }
+
         [HttpPut]
         [Route("UpdateDoctor")]
         public async Task<IActionResult> UpdateDoctor(int DrId, string? Doctor)
@@ -488,6 +540,18 @@ namespace ClinicWeb.Api.Controllers
                 return Ok(new { message = "State Added Successfully " });
             }
             return BadRequest(new { message = "State Not Added" });
+        }
+
+        [HttpGet]
+        [Route("GetState")]
+        public async Task<IActionResult> GetState(int Id)
+        {
+            var state = await unitOfWork.Repository<State>().GetById(Id);
+            if (state  == null)
+                return BadRequest(new { message = "Sates Not Found" });
+
+            return Ok(new { Name = state.Name });
+
         }
 
 
