@@ -322,27 +322,8 @@ namespace ClinicWeb.Api.Controllers
             if (visit == null)
                 return BadRequest(new { message = "Patient Not Found" });
 
-
-            //visit.DrName = model.DrName;
-            //visit.Nurse = model.Nurse;
-            //visit.SessionNote = model.SessionNote;
-            //visit.Date = model.Date;
-            //visit.TotalPrice = model.TotalPrice;
-            //visit.PaidPrice = model.PaidPrice;
-            //visit.RemainingPrice = model.RemainingPrice;
-            //visit.Visa = model.Visa;
-            //visit.Cash = model.Cash;
-            //visit.TotalSessions = model.TotalSessions;
-
-
-
-            //var result = await unitOfWork.Repository<Visit>().Update(visit);
-            //if (result)
-            //{
-                //await unitOfWork.Complete();
                 return Ok(visit);
-            //}
-           // return BadRequest(new { messag = "Visit Not Updated" });
+       
 
         }
 
@@ -449,18 +430,20 @@ namespace ClinicWeb.Api.Controllers
 
             var result = unitOfWork.Repository<Session>().GetAll().Where(v => v.PatientId == PatientId).ToList();
 
-            if (result.Any())
+            if (result.Count() > 0)
             {
-
-
                 var sessions = result.Select(session => new
                 {
                     Id = session.Id,
-                    ServiceName = unitOfWork.Repository<Service>().GetById((int)session.ServiceId).Result.ServiceName,
-                    Price = unitOfWork.Repository<Service>().GetById((int)session.ServiceId).Result.Price,
+                    Service = unitOfWork.Repository<Service>().GetById(session.ServiceId.Value).Result,
                     NoOfSessions = session.NumberSessions,
+                }).Select(session => new
+                {
+                    Id = session.Id,
+                    ServiceName = session.Service != null ? session.Service.ServiceName : null,
+                    Price = session.Service != null ? (double?)session.Service.Price : null,
+                    NoOfSessions = session.NoOfSessions,
                 });
-
 
                 return Ok(sessions);
             }
