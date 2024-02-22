@@ -7,6 +7,6 @@ namespace ClinicWeb.Api.Dtos
     {
         public int? NumberSessions { set; get; }
         public Status? Status { set; get; }
-        public double? TotalPrice { set; get; }
+        public double TotalPrice { set; get; }
     }
 }
