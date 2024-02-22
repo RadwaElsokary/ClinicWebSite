@@ -122,7 +122,7 @@ namespace ClinicWeb.Api.Controllers
         }
 
 
-      
+
         [HttpDelete]
         [Route("DeletePatient")]
         public async Task<IActionResult> DeletePatient(int PatientId)
@@ -130,6 +130,12 @@ namespace ClinicWeb.Api.Controllers
             var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
+
+            var visits =  unitOfWork.Repository<Visit>().GetAll().Where(v => v.PatientId == PatientId).ToList();
+            foreach (var visit in visits)
+            {
+                await unitOfWork.Repository<Visit>().Delete(visit);
+            }
 
             var result = await unitOfWork.Repository<Patient>().Delete(patient);
             if (result)
@@ -139,10 +145,9 @@ namespace ClinicWeb.Api.Controllers
             }
             else
             {
-                return StatusCode(400, new { message = "An error occur" });
+                return StatusCode(400, new { message = "An error occurred" });
             }
         }
-
         [HttpPost]
         [Route("AddSession")]
         public async Task<IActionResult> AddSession([FromForm] AddSessionDto model, int ServiceId, int PatientId)
