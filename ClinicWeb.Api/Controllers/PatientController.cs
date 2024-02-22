@@ -446,7 +446,8 @@ namespace ClinicWeb.Api.Controllers
                 {
                     Id = session.Id,
                     ServiceName = session.Service != null ? session.Service.ServiceName : null,
-                    Price = session.Service != null ? (double?)session.Service.Price : null,
+                    ServicePrice = session.Service != null ? (double?)session.Service.Price : null,
+                    TotalPrice = session.Service.Price * session.NoOfSessions,
                     NoOfSessions = session.NoOfSessions,
                 });
 
