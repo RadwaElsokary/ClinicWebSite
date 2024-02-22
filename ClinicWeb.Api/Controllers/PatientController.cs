@@ -239,15 +239,15 @@ namespace ClinicWeb.Api.Controllers
 
             patient.TotalPriceSessions = patient.TotalPriceSessions - session.TotalPrice;
 
+            await unitOfWork.Repository<Patient>().Update(patient);
+            await unitOfWork.Complete();
+
             var result = await unitOfWork.Repository<Session>().Delete(session);
             if (result)
             {
-                  await unitOfWork.Repository<Patient>().Update(patient);
-                await unitOfWork.Complete();
                 return Ok(new { message = "Session Deleted Successfully" });
             }
             return BadRequest(new { messag = "Session Not Deleted" });
-
         }
 
 
