@@ -216,12 +216,12 @@ namespace ClinicWeb.Api.Controllers
             session.Status = model.Status;
             session.ServiceId = ServiceId;
 
-
             var result = await unitOfWork.Repository<Session>().Update(session);
+            patient.TotalPriceSessions = patient.TotalPriceSessions + model.TotalPrice;
+
             if (result)
             {
 
-                patient.TotalPriceSessions = patient.TotalPriceSessions + session.TotalPrice;
                 await unitOfWork.Repository<Patient>().Update(patient);
                 await unitOfWork.Complete();
                 return Ok(new { message = "Session Updated Successfully" });
@@ -239,21 +239,29 @@ namespace ClinicWeb.Api.Controllers
                 return BadRequest(new { message = "Session Not Exist" });
 
             var patient = await unitOfWork.Repository<Patient>().GetById(session.PatientId);
+            if (patient == null)
+                return BadRequest(new { message = "Patient Not Found" });
 
-            patient.TotalPriceSessions = patient.TotalPriceSessions - session.TotalPrice;
-
-            await unitOfWork.Repository<Patient>().Update(patient);
-            await unitOfWork.Complete();
+            patient.TotalPriceSessions -= session.TotalPrice;
 
             var result = await unitOfWork.Repository<Session>().Delete(session);
-            if (result)
-            {
-                await unitOfWork.Complete();
-                return Ok(new { message = "Session Deleted Successfully" });
-            }
-            return BadRequest(new { messag = "Session Not Deleted" });
-        }
+            if (!result)
+                return BadRequest(new { message = "Session Not Deleted" });
 
+            var remainingSessionsExist =  unitOfWork.Repository<Session>().GetAll().Any(s => s.PatientId == session.PatientId && s.Id != SessionId);
+            if (!remainingSessionsExist)
+            {
+                patient.TotalPriceSessions = 0;
+                await unitOfWork.Repository<Patient>().Update(patient);
+            }
+            else
+            {
+                await unitOfWork.Repository<Patient>().Update(patient);
+            }
+
+            await unitOfWork.Complete();
+            return Ok(new { message = "Session Deleted Successfully" });
+        }
 
         [HttpGet]
         [Route("GetTotalPriceToVisit")]
@@ -474,15 +482,17 @@ namespace ClinicWeb.Api.Controllers
 
             double totalPrice = (double)result.Sum(session => session.TotalPrice);
 
-            var response = new
-            {
-                TotalPriceBeforeDiscound = totalPrice,
-                Discound = totalPrice - patient.TotalPriceSessions,
-                TotalPriceAfterDiscound = patient.TotalPriceSessions
+                var response = new
+                {
+                    TotalPriceBeforeDiscound = totalPrice,
+                    Discound = totalPrice - patient.TotalPriceSessions,
+                    TotalPriceAfterDiscound = patient.TotalPriceSessions
 
-            };
+                };
 
-            return Ok(response);
+
+                return Ok(response);
+            
         }
 
 
@@ -494,6 +504,7 @@ namespace ClinicWeb.Api.Controllers
             var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
+
             patient.TotalPriceSessions = patient.TotalPriceSessions - Discound;
 
             var result = await unitOfWork.Repository<Patient>().Update(patient);
