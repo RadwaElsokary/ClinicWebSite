@@ -121,8 +121,6 @@ namespace ClinicWeb.Api.Controllers
 
         }
 
-
-
         [HttpDelete]
         [Route("DeletePatient")]
         public async Task<IActionResult> DeletePatient(int PatientId)
@@ -169,10 +167,10 @@ namespace ClinicWeb.Api.Controllers
                 Status = model.Status
 
             };
+            patient.TotalPriceSessions = patient.TotalPriceSessions + session.TotalPrice;
             var result = await unitOfWork.Repository<Session>().Add(session);
             if (result)
             {
-               patient.TotalPriceSessions = patient.TotalPriceSessions + session.TotalPrice ;
                 await unitOfWork.Repository<Patient>().Update(patient);
                 await unitOfWork.Complete();
                 return Ok(new { message = "Session Added Successfully" });
