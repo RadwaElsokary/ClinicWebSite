@@ -248,6 +248,7 @@ namespace ClinicWeb.Api.Controllers
             var result = await unitOfWork.Repository<Session>().Delete(session);
             if (result)
             {
+                await unitOfWork.Complete();
                 return Ok(new { message = "Session Deleted Successfully" });
             }
             return BadRequest(new { messag = "Session Not Deleted" });
