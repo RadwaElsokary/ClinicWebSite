@@ -15,7 +15,7 @@ namespace ClinicWeb.Api.Dtos
         public string? DrName { set; get; }
         public string? Branch { set; get; }
         public Gender? Gender { set; get; }
-        public string? Diagnoses { set; get; }
+        public List<string>? Diagnoses { set; get; }
         public string? Notes { set; get; }
         public string? State { set; get; }
        

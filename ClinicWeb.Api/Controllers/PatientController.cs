@@ -1,4 +1,5 @@
 ﻿using ClinicWeb.Api.Dtos;
+using ClinicWeb.Api.Services.IServices;
 using ClinicWeb.Domain.Enums;
 using ClinicWeb.Domain.Models;
 using ClinicWeb.Repository.IRepository;
@@ -6,8 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting.Internal;
 using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
-
+using Microsoft.EntityFrameworkCore;
 namespace ClinicWeb.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -16,10 +16,12 @@ namespace ClinicWeb.Api.Controllers
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IWebHostEnvironment webHostEnvironment;
-        public PatientController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
+        private readonly IPatientServices patientServices;
+        public PatientController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, IPatientServices patientServices)
         {
             this.unitOfWork = unitOfWork;
             this.webHostEnvironment = webHostEnvironment;
+            this.patientServices = patientServices;
         }
 
         private string ProcessUploadFile(IFormFile photo)
@@ -60,7 +62,7 @@ namespace ClinicWeb.Api.Controllers
                 Address = model.Address,
                 Code = model.Code,
                 Branch = model.Branch,
-                Diagnoses = model.Diagnoses,
+                Diagnoses = model.Diagnoses.Select(diagnosis => new DiagnosisPatient { Name = diagnosis }).ToList(),
                 DrName = model.DrName,
                 FirstVist = model.FirstVist,
                 Notes = model.Notes,
@@ -79,7 +81,6 @@ namespace ClinicWeb.Api.Controllers
             return BadRequest(new { message = "An error occurred while adding the patient" });
         }
 
-
         [HttpPut]
         [Route("UpdatePatient")]
         public async Task<IActionResult> UpdatePatient([FromForm] AddPersonalDeatilsDto model, int PatientId)
@@ -87,6 +88,7 @@ namespace ClinicWeb.Api.Controllers
             var codeExist = await unitOfWork.Repository<Patient>().AnyAsync(p => p.Code == model.Code && p.Id != PatientId);
             if (codeExist && model.Code != null)
                 return BadRequest(new { message = "Exist Code" });
+
             var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
 
             if (patient == null)
@@ -94,6 +96,7 @@ namespace ClinicWeb.Api.Controllers
 
             string uniqueFileName = ProcessUploadFile(model.Image);
 
+            // Update patient details
             patient.FullName = model.FullName;
             patient.PhoneNumber = model.PhoneNumber;
             patient.Email = model.Email;
@@ -103,13 +106,19 @@ namespace ClinicWeb.Api.Controllers
             patient.Address = model.Address;
             patient.Code = model.Code;
             patient.Branch = model.Branch;
-            patient.Diagnoses = model.Diagnoses;
             patient.DrName = model.DrName;
             patient.FirstVist = model.FirstVist;
             patient.Notes = model.Notes;
             patient.State = model.State;
 
+            var existingDiagnoses =  unitOfWork.Repository<DiagnosisPatient>().GetAll().Where(d => d.PatientId == PatientId).ToList();
+            foreach (var diagnosis in existingDiagnoses)
+            {
+                await unitOfWork.Repository<DiagnosisPatient>().Delete(diagnosis);
+                await unitOfWork.Complete();
+            }
 
+            patient.Diagnoses = model.Diagnoses.Select(diagnosis => new DiagnosisPatient { Name = diagnosis }).ToList();
 
             var result = await unitOfWork.Repository<Patient>().Update(patient);
             if (result)
@@ -117,8 +126,7 @@ namespace ClinicWeb.Api.Controllers
                 await unitOfWork.Complete();
                 return Ok(new { message = "Patient Updated Successfully" });
             }
-            return BadRequest(new { messag = "Patient Not Added" });
-
+            return BadRequest(new { message = "Patient Not Updated" });
         }
 
         [HttpDelete]
@@ -129,7 +137,7 @@ namespace ClinicWeb.Api.Controllers
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
 
-            var visits =  unitOfWork.Repository<Visit>().GetAll().Where(v => v.PatientId == PatientId).ToList();
+            var visits = unitOfWork.Repository<Visit>().GetAll().Where(v => v.PatientId == PatientId).ToList();
             foreach (var visit in visits)
             {
                 await unitOfWork.Repository<Visit>().Delete(visit);
@@ -163,7 +171,7 @@ namespace ClinicWeb.Api.Controllers
                 ServiceId = ServiceId,
                 PatientId = PatientId,
                 NumberSessions = model.NumberSessions,
-                TotalPrice = model.TotalPrice ,
+                TotalPrice = model.TotalPrice,
                 Status = model.Status
 
             };
@@ -180,7 +188,7 @@ namespace ClinicWeb.Api.Controllers
 
         [HttpGet]
         [Route("GetSession")]
-        public async Task<IActionResult> GetSession( int SessionId)
+        public async Task<IActionResult> GetSession(int SessionId)
         {
             var session = await unitOfWork.Repository<Session>().GetById(SessionId);
             if (session == null)
@@ -190,8 +198,8 @@ namespace ClinicWeb.Api.Controllers
             if (service == null)
                 return BadRequest(new { message = "Service Not Exist" });
 
-                return Ok(new {SessionService = service.ServiceName , ServicePrice = service.Price , NOSessions = session.NumberSessions ,Status = session.Status.GetValueOrDefault(), TotalPrice = session.TotalPrice });
-          
+            return Ok(new { SessionService = service.ServiceName, ServicePrice = service.Price, NOSessions = session.NumberSessions, Status = session.Status.GetValueOrDefault(), TotalPrice = session.TotalPrice });
+
         }
 
 
@@ -209,7 +217,7 @@ namespace ClinicWeb.Api.Controllers
 
             var patient = await unitOfWork.Repository<Patient>().GetById(session.PatientId);
 
-            patient.TotalPriceSessions = patient.TotalPriceSessions - session.TotalPrice ;
+            patient.TotalPriceSessions = patient.TotalPriceSessions - session.TotalPrice;
 
             session.TotalPrice = model.TotalPrice;
             session.NumberSessions = model.NumberSessions;
@@ -248,7 +256,7 @@ namespace ClinicWeb.Api.Controllers
             if (!result)
                 return BadRequest(new { message = "Session Not Deleted" });
 
-            var remainingSessionsExist =  unitOfWork.Repository<Session>().GetAll().Any(s => s.PatientId == session.PatientId && s.Id != SessionId);
+            var remainingSessionsExist = unitOfWork.Repository<Session>().GetAll().Any(s => s.PatientId == session.PatientId && s.Id != SessionId);
             if (!remainingSessionsExist)
             {
                 patient.TotalPriceSessions = 0;
@@ -272,7 +280,7 @@ namespace ClinicWeb.Api.Controllers
                 return BadRequest(new { message = "Patient Not Found" });
 
 
-            return Ok( new { totalPrice = patient.TotalPriceSessions });
+            return Ok(new { totalPrice = patient.TotalPriceSessions });
         }
 
         [HttpGet]
@@ -289,7 +297,7 @@ namespace ClinicWeb.Api.Controllers
 
             var remaning = patient.TotalPriceSessions - result.Sum(session => session.PaidPrice);
 
-            return Ok(new { remaning = remaning});
+            return Ok(new { remaning = remaning });
         }
 
 
@@ -339,8 +347,8 @@ namespace ClinicWeb.Api.Controllers
             if (visit == null)
                 return BadRequest(new { message = "Patient Not Found" });
 
-                return Ok(visit);
-       
+            return Ok(visit);
+
 
         }
 
@@ -401,23 +409,64 @@ namespace ClinicWeb.Api.Controllers
         [Route("GetAllPatients")]
         public IActionResult GetAllPatients()
         {
-
-            var patients = unitOfWork.Repository<Patient>().GetAll();
+            var patients = unitOfWork.Repository<Patient>().GetAll().ToList();
 
             if (patients.Any())
             {
+                var patientList = new List<object>();
 
-                var patientList = patients.Select(patient => new
+                foreach (var patient in patients)
                 {
-                    Id = patient.Id,
-                    Name = patient.FullName,
-                    Phone = patient.PhoneNumber
+                    var lastVisitDate = unitOfWork.Repository<Visit>()
+                        .GetAll()
+                        .Where(v => v.PatientId == patient.Id)
+                        .OrderByDescending(v => v.Date)
+                        .Select(v => v.Date)
+                        .FirstOrDefault();
 
-                });
+                    var patientSessions = unitOfWork.Repository<Session>()
+                        .GetAll()
+                        .Where(a => a.PatientId == patient.Id)
+                        .Select(session => new
+                        {
+                            Id = session.Id,
+                            ServiceId = session.ServiceId,
+                            NoOfSessions = session.NumberSessions,
+                        })
+                        .ToList();
+
+                    var formattedSessions = new List<object>();
+
+                    foreach (var session in patientSessions)
+                    {
+                        var serviceName = unitOfWork.Repository<Service>()
+                            .GetById(session.ServiceId.Value)?.Result.ServiceName;
+
+
+                        formattedSessions.Add(new
+                        {
+                            Id = session.Id,
+                            ServiceName = serviceName,
+                            NoOfSessions = session.NoOfSessions,
+                        });
+                    }
+
+                    var formattedPatient = new
+                    {
+                        Id = patient.Id,
+                        Name = patient.FullName,
+                        Phone = patient.PhoneNumber,
+                        LastVisitDate = lastVisitDate,
+                        Sessions = formattedSessions,
+                    };
+
+                    patientList.Add(formattedPatient);
+                }
+
                 return Ok(patientList);
             }
-            return BadRequest(new { message = "Patients Not Found" });
 
+            return BadRequest(new { message = "Patients Not Found" });
         }
 
 
@@ -430,8 +479,27 @@ namespace ClinicWeb.Api.Controllers
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
 
+            var resonse = new
+            {
+                Id = patient.Id,
+                FullName = patient.FullName,
+                Code = patient.Code,
+                PhoneNumber = patient.PhoneNumber,
+                Email = patient.Email,
+                Age = patient.Age,
+                Address = patient.Address,
+                FirstVist = patient.FirstVist,
+                DrName = patient.DrName,
+                Branch = patient.Branch,
+                Gender = patient.Gender,
+                Diagnoses = unitOfWork.Repository<DiagnosisPatient>().GetAll().Where(a => a.PatientId == PatientId).Select(a => a.Name),
+                Notes = patient.Notes,
+                State = patient.Notes,
+                PhotoPath = patient.PhotoPath
+            };
 
-            return Ok(patient);
+
+            return Ok(resonse);
 
 
         }
@@ -452,7 +520,7 @@ namespace ClinicWeb.Api.Controllers
                 var sessions = result.Select(session => new
                 {
                     Id = session.Id,
-                    Service = unitOfWork.Repository<Service>().GetById(session.ServiceId).Result,
+                    Service = unitOfWork.Repository<Service>().GetById(session.ServiceId.Value).Result,
                     NoOfSessions = session.NumberSessions,
                 }).Select(session => new
                 {

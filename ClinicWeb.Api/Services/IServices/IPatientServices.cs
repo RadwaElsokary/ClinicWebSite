@@ -4,6 +4,6 @@ namespace ClinicWeb.Api.Services.IServices
 {
     public interface IPatientServices
     {
-        List<Visit> GetVisitByPatient(int PatientId);
+        string GetServiceName(int Id);
     }
 }

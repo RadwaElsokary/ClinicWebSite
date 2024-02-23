@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ClinicWeb.Domain.Models
 {
-    public class Service
+    public class DiagnosisPatient
     {
         public int Id { set; get; }
-        public string ServiceName { set; get; }
-        public double Price { set; get; }
-        public List<Session>? Sessions { set; get; } 
+        public string Name { set; get; }
+        public Patient Patient { set; get; }
+        public int PatientId { set; get; }
     }
 }

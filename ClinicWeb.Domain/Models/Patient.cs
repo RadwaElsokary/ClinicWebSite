@@ -20,7 +20,7 @@ namespace ClinicWeb.Domain.Models
         public string? DrName { set; get; }
         public string? Branch { set; get; }
         public Gender? Gender { set; get; }
-        public string? Diagnoses { set; get; }
+        public List<DiagnosisPatient>? Diagnoses { set; get; }
         public string? Notes { set; get; }
         public string? State { set; get; } 
         public string? PhotoPath { set; get; }

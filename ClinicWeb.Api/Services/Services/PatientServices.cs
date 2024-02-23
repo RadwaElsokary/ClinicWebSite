@@ -7,15 +7,17 @@ namespace ClinicWeb.Api.Services.Services
     public class PatientServices : IPatientServices
     {
         private readonly ApplicationDbContext context;
+        private string services;
+
         public PatientServices(ApplicationDbContext context)
         {
             this.context = context;
         }
 
-        public List<Visit> GetVisitByPatient (int PatientId)
+        public string GetServiceName(int Id)
         {
-            var visit = context.Visits.Where(a => a.PatientId == PatientId).ToList();
-            return visit.ToList();
+            var service = context.Services.FirstOrDefault(a=>a.Id == Id).ServiceName.ToString();
+            return services;
         }
     }
 }

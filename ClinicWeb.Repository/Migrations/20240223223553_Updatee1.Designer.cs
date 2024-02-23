@@ -4,6 +4,7 @@ using ClinicWeb.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClinicWeb.Repository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240223223553_Updatee1")]
+    partial class Updatee1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,28 +176,6 @@ namespace ClinicWeb.Repository.Migrations
                     b.ToTable("Diagnoses");
                 });
 
-            modelBuilder.Entity("ClinicWeb.Domain.Models.DiagnosisPatient", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PatientId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("DiagnosisPatients");
-                });
-
             modelBuilder.Entity("ClinicWeb.Domain.Models.Doctor", b =>
                 {
                     b.Property<int>("Id")
@@ -284,6 +264,9 @@ namespace ClinicWeb.Repository.Migrations
 
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Diagnoses")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DrName")
                         .HasColumnType("nvarchar(max)");
@@ -618,17 +601,6 @@ namespace ClinicWeb.Repository.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ClinicWeb.Domain.Models.DiagnosisPatient", b =>
-                {
-                    b.HasOne("ClinicWeb.Domain.Models.Patient", "Patient")
-                        .WithMany("Diagnoses")
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Patient");
-                });
-
             modelBuilder.Entity("ClinicWeb.Domain.Models.Session", b =>
                 {
                     b.HasOne("ClinicWeb.Domain.Models.Patient", "Patient")
@@ -708,8 +680,6 @@ namespace ClinicWeb.Repository.Migrations
 
             modelBuilder.Entity("ClinicWeb.Domain.Models.Patient", b =>
                 {
-                    b.Navigation("Diagnoses");
-
                     b.Navigation("Sessions");
 
                     b.Navigation("Visits");

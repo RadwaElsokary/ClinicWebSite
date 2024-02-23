@@ -10,7 +10,8 @@ namespace ClinicWeb.Domain.Models
     public class Session
     {
         public int Id { set; get; }
-        public int ServiceId { set; get; }
+        public Service? Service { set; get; }
+        public int? ServiceId { set; get; }
         public int? NumberSessions { set; get; }
         public Status? Status{set; get;}
         public double TotalPrice { set; get; } 
