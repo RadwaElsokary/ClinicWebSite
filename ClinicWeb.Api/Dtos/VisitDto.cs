@@ -7,7 +7,6 @@ namespace ClinicWeb.Api.Dtos
         public string? DrName { set; get; }
         public string? Nurse { set; get; }
         public DateTime? Date { set; get; }
-        public int? TotalSessions { set; get; }
         public string? SessionNote { set; get; }
         public double? TotalPrice { set; get; }
         public double? RemainingPrice { set; get; }

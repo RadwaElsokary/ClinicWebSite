@@ -317,7 +317,6 @@ namespace ClinicWeb.Api.Controllers
                 RemainingPrice = model.RemainingPrice,
                 Visa = model.Visa,
                 Cash = model.Cash,
-                TotalSessions = model.TotalSessions
 
             };
 
@@ -366,7 +365,6 @@ namespace ClinicWeb.Api.Controllers
             visit.RemainingPrice = model.RemainingPrice;
             visit.Visa = model.Visa;
             visit.Cash = model.Cash;
-            visit.TotalSessions = model.TotalSessions;
 
 
 
@@ -620,7 +618,6 @@ namespace ClinicWeb.Api.Controllers
                     Dr = visit.DrName,
                     Nurse= visit.Nurse,
                     VistDate = patient.FirstVist,
-                    TotalSessions = visit.TotalSessions,
                     Notes = visit.SessionNote,
                     TotalMoney = visit.TotalPrice,
                     Paid = visit.PaidPrice,
