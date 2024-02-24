@@ -13,7 +13,6 @@ namespace ClinicWeb.Domain.Models
         public Service? Service { set; get; }
         public int? ServiceId { set; get; }
         public int? NumberSessions { set; get; }
-        public Status? Status{set; get;}
         public double TotalPrice { set; get; } 
         public Patient? Patient { set; get; }
         public int PatientId { set; get; }

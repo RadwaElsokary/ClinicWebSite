@@ -1,5 +1,4 @@
 ﻿using ClinicWeb.Api.Dtos;
-using ClinicWeb.Api.Services.IServices;
 using ClinicWeb.Domain.Enums;
 using ClinicWeb.Domain.Models;
 using ClinicWeb.Repository.IRepository;
@@ -16,12 +15,10 @@ namespace ClinicWeb.Api.Controllers
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IPatientServices patientServices;
-        public PatientController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, IPatientServices patientServices)
+        public PatientController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             this.unitOfWork = unitOfWork;
             this.webHostEnvironment = webHostEnvironment;
-            this.patientServices = patientServices;
         }
 
         private string ProcessUploadFile(IFormFile photo)
@@ -67,7 +64,7 @@ namespace ClinicWeb.Api.Controllers
                 FirstVist = model.FirstVist,
                 Notes = model.Notes,
                 State = model.State,
-                TotalPriceSessions = (double)0
+                Discount = 0
             };
 
             var result = await unitOfWork.Repository<Patient>().Add(patient);
@@ -96,7 +93,6 @@ namespace ClinicWeb.Api.Controllers
 
             string uniqueFileName = ProcessUploadFile(model.Image);
 
-            // Update patient details
             patient.FullName = model.FullName;
             patient.PhoneNumber = model.PhoneNumber;
             patient.Email = model.Email;
@@ -172,10 +168,9 @@ namespace ClinicWeb.Api.Controllers
                 PatientId = PatientId,
                 NumberSessions = model.NumberSessions,
                 TotalPrice = model.TotalPrice,
-                Status = model.Status
 
             };
-            patient.TotalPriceSessions = patient.TotalPriceSessions + session.TotalPrice;
+            //patient.TotalPrice = patient.TotalPrice + session.TotalPrice;
             var result = await unitOfWork.Repository<Session>().Add(session);
             if (result)
             {
@@ -198,7 +193,7 @@ namespace ClinicWeb.Api.Controllers
             if (service == null)
                 return BadRequest(new { message = "Service Not Exist" });
 
-            return Ok(new { SessionService = service.ServiceName, ServicePrice = service.Price, NOSessions = session.NumberSessions, Status = session.Status.GetValueOrDefault(), TotalPrice = session.TotalPrice });
+            return Ok(new { SessionService = service.ServiceName, ServicePrice = service.Price, NOSessions = session.NumberSessions , TotalPrice = session.TotalPrice });
 
         }
 
@@ -217,15 +212,12 @@ namespace ClinicWeb.Api.Controllers
 
             var patient = await unitOfWork.Repository<Patient>().GetById(session.PatientId);
 
-            patient.TotalPriceSessions = patient.TotalPriceSessions - session.TotalPrice;
 
             session.TotalPrice = model.TotalPrice;
             session.NumberSessions = model.NumberSessions;
-            session.Status = model.Status;
             session.ServiceId = ServiceId;
 
             var result = await unitOfWork.Repository<Session>().Update(session);
-            patient.TotalPriceSessions = patient.TotalPriceSessions + model.TotalPrice;
 
             if (result)
             {
@@ -250,7 +242,6 @@ namespace ClinicWeb.Api.Controllers
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
 
-            patient.TotalPriceSessions -= session.TotalPrice;
 
             var result = await unitOfWork.Repository<Session>().Delete(session);
             if (!result)
@@ -259,7 +250,7 @@ namespace ClinicWeb.Api.Controllers
             var remainingSessionsExist = unitOfWork.Repository<Session>().GetAll().Any(s => s.PatientId == session.PatientId && s.Id != SessionId);
             if (!remainingSessionsExist)
             {
-                patient.TotalPriceSessions = 0;
+                patient.Discount = 0;
                 await unitOfWork.Repository<Patient>().Update(patient);
             }
             else
@@ -278,9 +269,10 @@ namespace ClinicWeb.Api.Controllers
             var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
+            var totalPrice = unitOfWork.Repository<Session>().GetAll().Where(a => a.PatientId == PatientId).Select(a => a.TotalPrice).Sum();
 
 
-            return Ok(new { totalPrice = patient.TotalPriceSessions });
+            return Ok(new { totalPrice = totalPrice - patient.Discount });
         }
 
         [HttpGet]
@@ -294,8 +286,10 @@ namespace ClinicWeb.Api.Controllers
             var result = unitOfWork.Repository<Visit>().GetAll().Where(v => v.PatientId == PatientId).ToList();
 
             var paidMoney = result.Sum(a => a.PaidPrice);
+            var totalPrice = unitOfWork.Repository<Session>().GetAll().Where(a => a.PatientId == PatientId).Select(a => a.TotalPrice).Sum();
+            var price = totalPrice - patient.Discount;
 
-            var remaning = patient.TotalPriceSessions - result.Sum(session => session.PaidPrice);
+            var remaning = price - result.Sum(session => session.PaidPrice);
 
             return Ok(new { remaning = remaning });
         }
@@ -553,8 +547,8 @@ namespace ClinicWeb.Api.Controllers
                 var response = new
                 {
                     TotalPriceBeforeDiscound = totalPrice,
-                    Discound = totalPrice - patient.TotalPriceSessions,
-                    TotalPriceAfterDiscound = patient.TotalPriceSessions
+                    Discound = patient.Discount,
+                    TotalPriceAfterDiscound = totalPrice - patient.Discount
 
                 };
 
@@ -573,10 +567,30 @@ namespace ClinicWeb.Api.Controllers
             if (patient == null)
                 return BadRequest(new { message = "Patient Not Found" });
 
-            patient.TotalPriceSessions = patient.TotalPriceSessions - Discound;
+            patient.Discount = patient.Discount + Discound;
 
             var result = await unitOfWork.Repository<Patient>().Update(patient);
             if(result)
+            {
+                await unitOfWork.Complete();
+                return Ok(new { message = "Discound Applayed Successfully" });
+            }
+
+            return BadRequest(new { message = "Discound Not Applayed" });
+        }
+
+        [HttpPut]
+        [Route("UpdateDiscoundSession")]
+        public async Task<IActionResult> UpdateDiscoundSession(int Discound, int PatientId)
+        {
+            var patient = await unitOfWork.Repository<Patient>().GetById(PatientId);
+            if (patient == null)
+                return BadRequest(new { message = "Patient Not Found" });
+
+            patient.Discount = Discound;
+
+            var result = await unitOfWork.Repository<Patient>().Update(patient);
+            if (result)
             {
                 await unitOfWork.Complete();
                 return Ok(new { message = "Discound Appalyed Successfully" });
@@ -584,7 +598,6 @@ namespace ClinicWeb.Api.Controllers
 
             return BadRequest(new { message = "Discound Appalyed" });
         }
-
 
         [HttpGet]
         [Route("GetAllVisitPatient")]

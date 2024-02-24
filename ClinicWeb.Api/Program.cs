@@ -1,5 +1,3 @@
-using ClinicWeb.Api.Services.IServices;
-using ClinicWeb.Api.Services.Services;
 using ClinicWeb.Domain.Models;
 using ClinicWeb.Repository;
 using ClinicWeb.Repository.IRepository;
@@ -28,7 +26,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IPatientServices, PatientServices>();
 
 //cors
 builder.Services.AddCors(options =>
